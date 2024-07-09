@@ -1,0 +1,28 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "shoe-store-b2d90",
+          "appId": "1:329007215461:android:d3a00fdc3b483a7ba2278c",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "shoe-store-b2d90",
+          "configurations": {
+            "android": "1:329007215461:android:d3a00fdc3b483a7ba2278c",
+            "ios": "1:329007215461:ios:145c20e98b1d8f87a2278c",
+            "macos": "1:329007215461:ios:145c20e98b1d8f87a2278c",
+            "web": "1:329007215461:web:e81ff2748ebcc172a2278c",
+            "windows": "1:329007215461:web:13ca5c962543400fa2278c"
+          }
+        }
+      }
+    }
+  },
+  "emulators": {
+    "singleProjectMode": true
+  }
+}
