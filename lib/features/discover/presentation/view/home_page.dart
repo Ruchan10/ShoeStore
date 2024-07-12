@@ -34,6 +34,7 @@ class _HomePageViewState extends ConsumerState<HomePageView> {
         preferredSize: const Size.fromHeight(80.0),
         child: AppBar(
           backgroundColor: Colors.white,
+          automaticallyImplyLeading: false,
           centerTitle: false,
           bottom: PreferredSize(
             preferredSize: const Size.fromHeight(0.0),

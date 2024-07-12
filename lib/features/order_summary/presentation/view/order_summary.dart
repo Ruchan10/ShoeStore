@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shoe_store_app/config/router/app_route.dart';
+import 'package:shoe_store_app/core/common/snackbar/my_snackbar.dart';
+import 'package:shoe_store_app/widgets/buttons.dart';
 
 // Dummy data class for order items
 class OrderItem {
@@ -25,26 +28,19 @@ class OrderItem {
 final orderItemsProvider = StateProvider<List<OrderItem>>((ref) {
   return [
     OrderItem(
-        name: 'Jordan 1 Retro High Tie Dye',
-        brand: 'Nike',
-        color: 'Red Grey',
+        name: 'X Anuel AA BB 4000 II',
+        brand: 'Rebook',
+        color: 'Black',
         size: 40,
-        price: 235.00,
-        quantity: 1),
+        price: 120.00,
+        quantity: 2),
     OrderItem(
-        name: 'Jordan 1 Retro High Tie Dye',
-        brand: 'Nike',
-        color: 'Red Grey',
-        size: 40,
-        price: 235.00,
-        quantity: 1),
-    OrderItem(
-        name: 'Jordan 1 Retro High Tie Dye',
-        brand: 'Nike',
-        color: 'Red Grey',
-        size: 40,
-        price: 235.00,
-        quantity: 1),
+        name: 'SAMBA OG SHOES',
+        brand: 'Adidas',
+        color: 'white',
+        size: 41,
+        price: 300.00,
+        quantity: 3),
   ];
 });
 
@@ -74,7 +70,17 @@ class _OrderSummaryViewState extends ConsumerState<OrderSummaryView> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Order Summary'),
+        backgroundColor: Colors.white,
+        title: const Text(
+          'Order Summary',
+          style: TextStyle(
+            color: Color(0xFF0F0F0F),
+            fontSize: 24,
+            fontFamily: 'Urbanist',
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0.30,
+          ),
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -158,16 +164,19 @@ class _OrderSummaryViewState extends ConsumerState<OrderSummaryView> {
               ),
             ),
             const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {},
-              style: ElevatedButton.styleFrom(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                ),
+            GestureDetector(
+              onTap: () {
+                Navigator.pushNamed(context, AppRoute.homeRoute);
+                showSnackBar(
+                    message: 'Payment successful',
+                    context: context,
+                    color: Colors.green);
+              },
+              child: const Button(
+                label: "PAYMENT",
+                textColor: Colors.white,
+                fill: true,
               ),
-              child: const Text('PAYMENT'),
             ),
           ],
         ),

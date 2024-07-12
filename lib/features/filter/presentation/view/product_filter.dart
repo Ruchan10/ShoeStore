@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shoe_store_app/config/router/app_route.dart';
 import 'package:shoe_store_app/widgets/buttons.dart';
 
 class ProductFilterView extends ConsumerStatefulWidget {
@@ -281,8 +282,13 @@ class _ProductFilterViewState extends ConsumerState<ProductFilterView> {
                         child: Button(
                             label: "RESET ($_resetCount)",
                             textColor: Colors.black)),
-                    const Button(
-                        label: "APPLY", textColor: Colors.white, fill: true),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pushNamed(context, AppRoute.homeRoute);
+                      },
+                      child: const Button(
+                          label: "APPLY", textColor: Colors.white, fill: true),
+                    ),
                   ],
                 ),
               ],
