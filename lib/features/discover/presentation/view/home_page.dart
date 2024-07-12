@@ -5,7 +5,8 @@ import 'package:get/get.dart';
 import 'package:shoe_store_app/config/router/app_route.dart';
 import 'package:shoe_store_app/features/discover/data/model/shoe_model.dart';
 import 'package:shoe_store_app/features/discover/data/repository/shoe_repository.dart';
-import 'package:shoe_store_app/features/filter/presentation/view/product_filter.dart';
+import 'package:shoe_store_app/features/reviews/data/repository/review_controller.dart';
+import 'package:shoe_store_app/widgets/texts.dart';
 
 class HomePageView extends ConsumerStatefulWidget {
   const HomePageView({super.key});
@@ -19,36 +20,55 @@ class _HomePageViewState extends ConsumerState<HomePageView> {
 
   @override
   Widget build(BuildContext context) {
+    List<String> imageNamesList;
     final controller = Get.put(ShoeController());
+    final reviewController = Get.put(ReviewController());
     const imageUrl =
         "https://firebasestorage.googleapis.com/b/gs://shoe-store-b2d90.appspot.com/o/";
     final storage = FirebaseStorage.instanceFor(
         bucket: "gs://shoe-store-b2d90.appspot.com");
-
+    print("getReviews0");
+    // reviewController.getReviews0();
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Discover',
-          textAlign: TextAlign.left,
-          style: TextStyle(
-            color: Color(0xFF0F0F0F),
-            fontSize: 30,
-            fontFamily: 'Urbanist',
-            fontWeight: FontWeight.w700,
-            height: 0.05,
-            letterSpacing: 0.30,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(80.0),
+        child: AppBar(
+          backgroundColor: Colors.white,
+          centerTitle: false,
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(0.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.only(left: 16.0),
+                  child: Text(
+                    'Discover',
+                    style: TextStyle(
+                      color: Color(0xFF0F0F0F),
+                      fontSize: 30,
+                      fontFamily: 'Urbanist',
+                      fontWeight: FontWeight.w700,
+                      height: 0.05,
+                      letterSpacing: 0.30,
+                    ),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.shopping_bag_outlined),
+                  onPressed: () {
+                    Navigator.pushNamed(context, AppRoute.cartRoute);
+                  },
+                ),
+              ],
+            ),
           ),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_none),
-            onPressed: () {},
-          ),
-        ],
       ),
       body: SafeArea(
         child: Column(
           children: [
+            const SizedBox(height: 10),
             CategorySelector(
               selectedCategory: selectedCategory,
               onCategorySelected: (category) {
@@ -83,6 +103,8 @@ class _HomePageViewState extends ConsumerState<HomePageView> {
                         itemCount: filteredShoes.length,
                         itemBuilder: (context, index) {
                           final shoe = filteredShoes[index];
+                          print("_-------------------");
+                          print(shoe.shoeImage);
                           return Card(
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8.0),
@@ -90,7 +112,17 @@ class _HomePageViewState extends ConsumerState<HomePageView> {
                             child: GestureDetector(
                               onTap: () {
                                 Navigator.pushNamed(
-                                    context, AppRoute.productRoute);
+                                  context,
+                                  AppRoute.productRoute,
+                                  arguments: {
+                                    'shoeImage': shoe.shoeImage,
+                                    'shoeName': shoe.shoeName,
+                                    'shoePrice': shoe.shoePrice,
+                                    'shoeRating': shoe.shoeRating,
+                                    'shoeReview': shoe.shoeReview,
+                                    'shoeDescription': shoe.desc,
+                                  },
+                                );
                               },
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -170,15 +202,18 @@ class CategorySelector extends StatelessWidget {
         child: Row(
           children: categories.map((category) {
             final bool isSelected = category == selectedCategory;
-            return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: GestureDetector(
-                onTap: () {
-                  onCategorySelected(category);
-                },
+            return GestureDetector(
+              onTap: () {
+                onCategorySelected(category);
+              },
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 6.0),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
                 child: Text(
                   category,
                   style: TextStyle(
+                    letterSpacing: 0.20,
                     fontSize: 20,
                     fontFamily: 'Urbanist',
                     fontWeight: isSelected ? FontWeight.w700 : FontWeight.w400,
@@ -201,11 +236,6 @@ class FilterButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        // showModalBottomSheet(
-        //   context: context,
-        //   isScrollControlled: true,
-        //   builder: (context) => const ProductFilterView(),
-        // );
         Navigator.pushNamed(context, AppRoute.productFilter);
       },
       child: Column(
@@ -228,67 +258,20 @@ class FilterButton extends StatelessWidget {
                 )
               ],
             ),
-            child: Row(
+            child: const Row(
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: Stack(
-                    children: [
-                      const Positioned(
-                        left: 0,
-                        top: 0.50,
-                        child: SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              SizedBox(width: 20, height: 20, child: Stack()),
-                            ],
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 14,
-                        top: -1.50,
-                        child: Container(
-                          width: 8,
-                          height: 8,
-                          decoration: const ShapeDecoration(
-                            color: Color(0xFFFF4C5E),
-                            shape: OvalBorder(),
-                            shadows: [
-                              BoxShadow(
-                                color: Color.fromARGB(22, 255, 0, 0),
-                                blurRadius: 3,
-                                offset: Offset(-1, 2),
-                                spreadRadius: 0,
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 16),
-                const Text(
-                  'FILTER',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                    fontFamily: 'Urbanist',
-                    fontWeight: FontWeight.w700,
-                    height: 0,
-                    letterSpacing: 0.14,
-                  ),
+                Icon(Icons.format_list_bulleted_sharp,
+                    size: 20, color: Colors.white),
+                SizedBox(width: 8),
+                MyText(
+                  label: "FILTER",
+                  textColor: Colors.white,
+                  size: 14,
+                  height: 0,
+                  letterSpacing: .14,
                 ),
               ],
             ),

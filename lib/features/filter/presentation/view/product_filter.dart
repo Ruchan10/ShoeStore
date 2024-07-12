@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shoe_store_app/widgets/buttons.dart';
 
 class ProductFilterView extends ConsumerStatefulWidget {
   const ProductFilterView({super.key});
@@ -15,30 +16,44 @@ class _ProductFilterViewState extends ConsumerState<ProductFilterView> {
   String? _selectedSortOption;
   String? _selectedGenderOption;
   String? _selectedColorOption;
+  int _resetCount = 0;
 
   void _toggleSelection(String brandName) {
     setState(() {
       if (_selectedBrands.contains(brandName)) {
         _selectedBrands.remove(brandName);
+        _resetCount--;
       } else {
         _selectedBrands.add(brandName);
+        _resetCount++;
       }
     });
   }
 
   void _selectSortOption(String label) {
+    if (_selectedSortOption == null) {
+      _resetCount++;
+    }
     setState(() {
       _selectedSortOption = label;
     });
   }
 
   void _selectGenderOption(String label) {
+    if (_selectedGenderOption == null) {
+      _resetCount++;
+    }
     setState(() {
       _selectedGenderOption = label;
     });
   }
 
   void _selectColorOption(String label) {
+    print(_selectedColorOption == null);
+    print("_selectedColorOption");
+    if (_selectedColorOption == null) {
+      _resetCount++;
+    }
     setState(() {
       _selectedColorOption = label;
     });
@@ -246,35 +261,28 @@ class _ProductFilterViewState extends ConsumerState<ProductFilterView> {
                       isSelected: _selectedColorOption == 'Red',
                       onSelect: _selectColorOption,
                     ),
-                    // ColorOption(
-                    //   label: 'Green',
-                    //   color: Colors.green,
-                    //   isSelected: _selectedColorOption == 'Green',
-                    //   onSelect: _selectColorOption,
-                    // ),
                   ],
                 ),
                 const SizedBox(height: 32),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    ElevatedButton(
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                        side: const BorderSide(color: Colors.black),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 32, vertical: 16),
-                      ),
-                      child: const Text('RESET (4)'),
-                    ),
-                    ElevatedButton(
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 32, vertical: 16),
-                      ),
-                      child: const Text('APPLY'),
-                    ),
+                    GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _selectedBrands.clear();
+                            _currentRangeValues = const RangeValues(0, 1750);
+                            _selectedSortOption = null;
+                            _selectedGenderOption = null;
+                            _selectedColorOption = null;
+                            _resetCount = 0;
+                          });
+                        },
+                        child: Button(
+                            label: "RESET ($_resetCount)",
+                            textColor: Colors.black)),
+                    const Button(
+                        label: "APPLY", textColor: Colors.white, fill: true),
                   ],
                 ),
               ],

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:get/get.dart';
+import 'package:shoe_store_app/features/reviews/data/model/review_model.dart';
+import 'package:shoe_store_app/features/reviews/data/repository/review_controller.dart';
 
 class ProductReviewsView extends ConsumerStatefulWidget {
   const ProductReviewsView({super.key});
@@ -10,8 +13,16 @@ class ProductReviewsView extends ConsumerStatefulWidget {
 }
 
 class _ProductReviewsViewState extends ConsumerState<ProductReviewsView> {
+  String selectedStar = 'All';
+  final reviewController = Get.put(ReviewController());
+
   @override
   Widget build(BuildContext context) {
+    final arguments =
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    final shoeName = arguments['shoeName'];
+    final shoeRating = arguments['shoeRating'];
+    final shoeReview = arguments['shoeReview'];
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -28,11 +39,11 @@ class _ProductReviewsViewState extends ConsumerState<ProductReviewsView> {
                         Navigator.pop(context);
                       },
                     ),
-                    const Expanded(
+                    Expanded(
                       child: Center(
                         child: Text(
-                          'Review (1045)',
-                          style: TextStyle(
+                          'Review $shoeReview',
+                          style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
@@ -40,9 +51,9 @@ class _ProductReviewsViewState extends ConsumerState<ProductReviewsView> {
                       ),
                     ),
                     const Icon(Icons.star, color: Colors.yellow),
-                    const Text(
-                      '4.5',
-                      style: TextStyle(
+                    Text(
+                      shoeRating,
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
@@ -50,71 +61,53 @@ class _ProductReviewsViewState extends ConsumerState<ProductReviewsView> {
                   ],
                 ),
                 const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    FilterChip(
-                        label: const Text('All'),
-                        selected: true,
-                        onSelected: (_) {}),
-                    FilterChip(
-                        label: const Text('5 Stars'),
-                        selected: false,
-                        onSelected: (_) {}),
-                    FilterChip(
-                        label: const Text('4 Stars'),
-                        selected: false,
-                        onSelected: (_) {}),
-                    FilterChip(
-                        label: const Text('3 Stars'),
-                        selected: false,
-                        onSelected: (_) {}),
-                    FilterChip(
-                        label: const Text('2 Stars'),
-                        selected: false,
-                        onSelected: (_) {}),
-                  ],
+                StarsFilter(
+                  selectedStar: selectedStar,
+                  onStarSelected: (category) {
+                    setState(() {
+                      selectedStar = category;
+                    });
+                  },
                 ),
                 const SizedBox(height: 16),
-                const ReviewItem(
-                  imageUrl: 'https://via.placeholder.com/150',
-                  name: 'Nolan Carder',
-                  rating: 5,
-                  date: 'Today',
-                  comment:
-                      'Perfect for keeping your feet dry and warm in damp conditions.',
-                ),
-                const ReviewItem(
-                  imageUrl: 'https://via.placeholder.com/150',
-                  name: 'Maria Saris',
-                  rating: 4,
-                  date: 'Today',
-                  comment:
-                      'Perfect for keeping your feet dry and warm in damp conditions.',
-                ),
-                const ReviewItem(
-                  imageUrl: 'https://via.placeholder.com/150',
-                  name: 'Gretchen Septimus',
-                  rating: 5,
-                  date: 'Today',
-                  comment:
-                      'Perfect for keeping your feet dry and warm in damp conditions.',
-                ),
-                const ReviewItem(
-                  imageUrl: 'https://via.placeholder.com/150',
-                  name: 'Roger Stanton',
-                  rating: 4,
-                  date: 'Today',
-                  comment:
-                      'Perfect for keeping your feet dry and warm in damp conditions.',
-                ),
-                const ReviewItem(
-                  imageUrl: 'https://via.placeholder.com/150',
-                  name: 'Hanna Levin',
-                  rating: 5,
-                  date: 'Today',
-                  comment:
-                      'Perfect for keeping your feet dry and warm in damp conditions.',
+                FutureBuilder<List<ReviewModel>>(
+                  future: reviewController.getReviewsByShoeName(shoeName),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.done) {
+                      if (snapshot.hasData) {
+                        final reviews = snapshot.data!.where((review) {
+                          if (selectedStar == 'All') {
+                            return true;
+                          } else if (selectedStar == '5 Stars') {
+                            return review.rating == 5;
+                          } else if (selectedStar == '4 Stars') {
+                            return review.rating == 4 || review.rating == 4.5;
+                          } else if (selectedStar == '3 Stars') {
+                            return review.rating == 3 || review.rating == 3.5;
+                          } else if (selectedStar == '2 Stars') {
+                            return review.rating == 2 || review.rating == 2.5;
+                          } else if (selectedStar == '1 Star') {
+                            return review.rating == 1 || review.rating == 1.5;
+                          }
+
+                          return false;
+                        }).toList();
+
+                        return Column(
+                          children: reviews.map((review) {
+                            return ReviewItem(
+                              name: review.reviewer,
+                              comment: review.comment,
+                              date: review.date,
+                              imageUrl: review.profilePicture,
+                              rating: review.rating.toInt(),
+                            );
+                          }).toList(),
+                        );
+                      }
+                    }
+                    return const Center(child: CircularProgressIndicator());
+                  },
                 ),
               ],
             ),
@@ -150,7 +143,7 @@ class ReviewItem extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 24,
-            backgroundImage: NetworkImage(imageUrl),
+            backgroundImage: AssetImage("assets/images/$imageUrl"),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -193,6 +186,60 @@ class ReviewItem extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class StarsFilter extends StatelessWidget {
+  final List<String> categories = [
+    'All',
+    '5 Stars',
+    '4 Stars',
+    '3 Stars',
+    '2 Stars',
+    '1 Star'
+  ];
+  final String selectedStar;
+  final ValueChanged<String> onStarSelected;
+
+  StarsFilter({
+    super.key,
+    required this.selectedStar,
+    required this.onStarSelected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: categories.map((category) {
+            final bool isSelected = category == selectedStar;
+            return GestureDetector(
+              onTap: () {
+                onStarSelected(category);
+              },
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 6.0),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+                child: Text(
+                  category,
+                  style: TextStyle(
+                    letterSpacing: 0.20,
+                    fontSize: 20,
+                    fontFamily: 'Urbanist',
+                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w400,
+                    color: isSelected ? Colors.black : Colors.grey,
+                  ),
+                ),
+              ),
+            );
+          }).toList(),
+        ),
       ),
     );
   }

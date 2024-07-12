@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shoe_store_app/features/product_detail/presentation/widget/bottom_sheet.dart';
+import 'package:get/get.dart';
+import 'package:shoe_store_app/config/router/app_route.dart';
+import 'package:shoe_store_app/features/cart/presentation/widget/bottom_sheet.dart';
+import 'package:shoe_store_app/features/product_detail/presentation/widget/widgets.dart';
+import 'package:shoe_store_app/features/reviews/data/model/review_model.dart';
+import 'package:shoe_store_app/features/reviews/data/repository/review_controller.dart';
+import 'package:shoe_store_app/widgets/buttons.dart';
+import 'package:shoe_store_app/widgets/texts.dart';
 
 class ProductDetailView extends ConsumerStatefulWidget {
   const ProductDetailView({super.key});
@@ -11,8 +18,36 @@ class ProductDetailView extends ConsumerStatefulWidget {
 }
 
 class _ProductDetailViewState extends ConsumerState<ProductDetailView> {
+  String? _selectedSizeOption;
+  String? _selectedColorOption;
+
+  void _selectSizeOption(String label) {
+    setState(() {
+      _selectedSizeOption = label;
+    });
+  }
+
+  void _selectColorOption(String label) {
+    setState(() {
+      _selectedColorOption = label;
+    });
+  }
+
+  final controller = Get.put(ReviewController());
+  String selectedCategory = 'All';
+
   @override
   Widget build(BuildContext context) {
+    final arguments =
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+
+    final shoeImage = arguments['shoeImage'];
+    final shoeName = arguments['shoeName'];
+    final shoePrice = arguments['shoePrice'];
+    final shoeRating = arguments['shoeRating'];
+    final shoeReview = arguments['shoeReview'];
+    final shoeDescription = arguments['shoeDescription'];
+
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -38,49 +73,70 @@ class _ProductDetailViewState extends ConsumerState<ProductDetailView> {
                 ),
                 const SizedBox(height: 16),
                 Center(
-                  child: Container(
-                    width: double.infinity,
-                    height: 200,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
-                      image: const DecorationImage(
-                        image:
-                            NetworkImage('https://example.com/shoe_image.jpg'),
-                        fit: BoxFit.cover,
-                      ),
+                  child: SizedBox(
+                    width: 315,
+                    height: 315,
+                    child: Stack(
+                      children: [
+                        Container(
+                          width: 315,
+                          height: 315,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(16),
+                            image: DecorationImage(
+                              image: AssetImage('assets/images/$shoeImage'),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                        const Positioned(
+                          left: 10,
+                          bottom: 10,
+                          child: Row(
+                            children: [
+                              Icon(Icons.circle, size: 10, color: Colors.grey),
+                              SizedBox(width: 4),
+                              Icon(Icons.circle, size: 10, color: Colors.black),
+                              SizedBox(width: 4),
+                              Icon(Icons.circle, size: 10, color: Colors.grey),
+                            ],
+                          ),
+                        ),
+                        Positioned(
+                          right: 10,
+                          bottom: 10,
+                          child: Row(
+                            children: [
+                              ColorPicker(
+                                selectedColor: _selectedColorOption,
+                                onSelect: _selectColorOption,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
                 const SizedBox(height: 16),
-                const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.circle, size: 10, color: Colors.grey),
-                    SizedBox(width: 4),
-                    Icon(Icons.circle, size: 10, color: Colors.black),
-                    SizedBox(width: 4),
-                    Icon(Icons.circle, size: 10, color: Colors.grey),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                const Text(
-                  'Jordan 1 Retro High Tie Dye',
-                  style: TextStyle(
+                Text(
+                  shoeName,
+                  style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const Row(
+                Row(
                   children: [
-                    Icon(Icons.star, color: Colors.yellow, size: 20),
-                    Icon(Icons.star, color: Colors.yellow, size: 20),
-                    Icon(Icons.star, color: Colors.yellow, size: 20),
-                    Icon(Icons.star, color: Colors.yellow, size: 20),
-                    Icon(Icons.star, color: Colors.grey, size: 20),
-                    SizedBox(width: 8),
-                    Text('4.5'),
-                    SizedBox(width: 8),
-                    Text('(1065 Reviews)'),
+                    const Icon(Icons.star, color: Colors.yellow, size: 20),
+                    const Icon(Icons.star, color: Colors.yellow, size: 20),
+                    const Icon(Icons.star, color: Colors.yellow, size: 20),
+                    const Icon(Icons.star, color: Colors.yellow, size: 20),
+                    const Icon(Icons.star, color: Colors.grey, size: 20),
+                    const SizedBox(width: 8),
+                    Text(shoeRating),
+                    const SizedBox(width: 8),
+                    Text("($shoeReview)"),
                   ],
                 ),
                 const SizedBox(height: 16),
@@ -92,13 +148,33 @@ class _ProductDetailViewState extends ConsumerState<ProductDetailView> {
                   ),
                 ),
                 const SizedBox(height: 8),
-                const Row(
+                Row(
                   children: [
-                    SizeOption(size: '39'),
-                    SizeOption(size: '39.5'),
-                    SizeOption(size: '40'),
-                    SizeOption(size: '40.5'),
-                    SizeOption(size: '41', isSelected: true),
+                    SizeOption(
+                      label: '39',
+                      isSelected: _selectedSizeOption == '39',
+                      onSelect: _selectSizeOption,
+                    ),
+                    SizeOption(
+                      label: '39.5',
+                      isSelected: _selectedSizeOption == '39.5',
+                      onSelect: _selectSizeOption,
+                    ),
+                    SizeOption(
+                      label: '40',
+                      isSelected: _selectedSizeOption == '40',
+                      onSelect: _selectSizeOption,
+                    ),
+                    SizeOption(
+                      label: '40.5',
+                      isSelected: _selectedSizeOption == '40.5',
+                      onSelect: _selectSizeOption,
+                    ),
+                    SizeOption(
+                      label: '41',
+                      isSelected: _selectedSizeOption == '41',
+                      onSelect: _selectSizeOption,
+                    ),
                   ],
                 ),
                 const SizedBox(height: 16),
@@ -110,108 +186,105 @@ class _ProductDetailViewState extends ConsumerState<ProductDetailView> {
                   ),
                 ),
                 const SizedBox(height: 8),
-                const Text(
-                  'Engineered to crush any movement-based workout. These on sneakers enhance the label’s original Cloud sneaker with cutting edge technologies for a pair.',
+                Text(
+                  shoeDescription,
                 ),
                 const SizedBox(height: 16),
-                const Text(
-                  'Review (1065)',
-                  style: TextStyle(
+                Text(
+                  'Reviews ($shoeReview)',
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 const SizedBox(height: 8),
-                const ReviewItem(
-                  reviewerName: 'Nolan Carder',
-                  reviewText:
-                      'Perfect for keeping your feet dry and warm in damp conditions',
-                  reviewDate: 'Today',
-                  reviewerImage: 'https://example.com/reviewer1.jpg',
-                ),
-                const ReviewItem(
-                  reviewerName: 'Maria Saris',
-                  reviewText:
-                      'Perfect for keeping your feet dry and warm in damp conditions',
-                  reviewDate: 'Today',
-                  reviewerImage: 'https://example.com/reviewer2.jpg',
-                ),
-                const ReviewItem(
-                  reviewerName: 'Gretchen Septimus',
-                  reviewText:
-                      'Perfect for keeping your feet dry and warm in damp conditions',
-                  reviewDate: 'Today',
-                  reviewerImage: 'https://example.com/reviewer3.jpg',
+                FutureBuilder<List<ReviewModel>>(
+                  future: controller.getReviewsByShoeName(shoeName),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.done) {
+                      if (snapshot.hasData) {
+                        final reviews = snapshot.data!;
+                        reviews.sort((a, b) => b.rating.compareTo(a.rating));
+                        final topReviews = reviews.take(3).toList();
+
+                        return Column(
+                          children: topReviews.map((review) {
+                            return ReviewItem(
+                              reviewerName: review.reviewer,
+                              reviewText: review.comment,
+                              reviewDate: review.date,
+                              reviewerImage: review.profilePicture,
+                            );
+                          }).toList(),
+                        );
+                      }
+                    }
+                    return const Center(child: CircularProgressIndicator());
+                  },
                 ),
                 const SizedBox(height: 16),
                 Center(
-                  child: ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 40, vertical: 16),
-                    ),
-                    child: const Text('SEE ALL REVIEW'),
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.pushNamed(
+                        context,
+                        AppRoute.productReview,
+                        arguments: {
+                          'shoeName': shoeName,
+                          'shoeRating': shoeRating,
+                          'shoeReview': shoeReview,
+                        },
+                      );
+                    },
+                    child: const Button(
+                        label: "SEE ALL REVIEW",
+                        textColor: Colors.black,
+                        width: double.infinity),
                   ),
                 ),
                 const SizedBox(height: 16),
-                const Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Price',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                SizedBox(
+                  height: 50,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          const MyText(
+                              label: "Price", textColor: Color(0xFFB7B7B7)),
+                          MyText(
+                            label: "\$$shoePrice",
+                            textColor: const Color(0xFF0F0F0F),
+                            size: 20,
+                            weight: FontWeight.w700,
+                            height: 0.07,
+                            letterSpacing: 0.20,
+                          ),
+                        ],
                       ),
-                    ),
-                    Text(
-                      '\$235.00',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                      GestureDetector(
+                        onTap: () {
+                          showModalBottomSheet(
+                            isScrollControlled: true,
+                            context: context,
+                            builder: (context) {
+                              return AddToCart(price: shoePrice, s:shoeName, si:_selectedSizeOption.toString());
+                            },
+                          );
+                        },
+                        child: const Button(
+                            label: "ADD TO CART",
+                            textColor: Colors.white,
+                            fill: true),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                Center(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      showModalBottomSheet(
-                        context: context,
-                        builder: (context) => const BottomSheetContent(),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 80, vertical: 16),
-                    ),
-                    child: const Text('ADD TO CART'),
+                    ],
                   ),
                 ),
               ],
             ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-class SizeOption extends StatelessWidget {
-  final String size;
-  final bool isSelected;
-
-  const SizeOption({super.key, required this.size, this.isSelected = false});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(4.0),
-      child: ChoiceChip(
-        label: Text(size),
-        selected: isSelected,
       ),
     );
   }
@@ -236,33 +309,39 @@ class ReviewItem extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           CircleAvatar(
-            backgroundImage: NetworkImage(reviewerImage),
+            backgroundImage: AssetImage("assets/images/$reviewerImage"),
             radius: 20,
           ),
           const SizedBox(width: 8),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                reviewerName,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  reviewerName,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-              Text(reviewDate),
-              const Row(
-                children: [
-                  Icon(Icons.star, color: Colors.yellow, size: 16),
-                  Icon(Icons.star, color: Colors.yellow, size: 16),
-                  Icon(Icons.star, color: Colors.yellow, size: 16),
-                  Icon(Icons.star, color: Colors.yellow, size: 16),
-                  Icon(Icons.star, color: Colors.yellow, size: 16),
-                ],
-              ),
-              Text(reviewText),
-            ],
+                Text(reviewDate),
+                const Row(
+                  children: [
+                    Icon(Icons.star, color: Colors.yellow, size: 16),
+                    Icon(Icons.star, color: Colors.yellow, size: 16),
+                    Icon(Icons.star, color: Colors.yellow, size: 16),
+                    Icon(Icons.star, color: Colors.yellow, size: 16),
+                    Icon(Icons.star, color: Colors.yellow, size: 16),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  reviewText,
+                ),
+              ],
+            ),
           ),
         ],
       ),

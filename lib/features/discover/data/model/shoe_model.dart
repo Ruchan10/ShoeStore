@@ -8,6 +8,10 @@ class ShoeModel {
   final String shoeReview;
   final String shoeImage;
   final String company;
+  final String date;
+  final String gender;
+  final String color;
+  final String desc;
 
   const ShoeModel({
     this.id,
@@ -17,6 +21,10 @@ class ShoeModel {
     required this.shoeReview,
     required this.shoeImage,
     required this.company,
+    required this.gender,
+    required this.date,
+    required this.color,
+    required this.desc,
   });
   toJson() {
     return {
@@ -25,7 +33,11 @@ class ShoeModel {
       "ShoeRating": shoeRating,
       "ShoeReview": shoeReview,
       "ShoeImage": shoeImage,
+      "Date": date,
+      "Gender": gender,
+      "Color": color,
       "Company": company,
+      "Desc": desc,
     };
   }
 
@@ -40,6 +52,10 @@ class ShoeModel {
       shoeReview: data["ShoeReview"],
       shoeImage: data["ShoeImage"],
       company: data["Company"],
+      date: data["Date"],
+      gender: data["Gender"],
+      color: data["Color"],
+      desc: data["Desc"],
     );
   }
 }
