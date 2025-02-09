@@ -4,11 +4,18 @@
 
 The Shoe Store App is a Flutter application that allows users to browse and manage their cart of shoe products. The app integrates with a backend service to fetch cart details, manage cart items, and perform checkout operations.
 
-### Try the app
+## Try the app
 1. Navigate to the [Releases](https://github.com/Ruchan10/ShoeStore/releases) section of this repository.  
 2. Download the latest APK.  
 3. Install the APK on your Android device to explore the app.
 
+## Screenshots
+
+| <img src="https://raw.githubusercontent.com/Ruchan10/ShoeStore/main/assets/images/screenshots/flutter_01.png" width="45%"> | <img src="https://raw.githubusercontent.com/Ruchan10/ShoeStore/main/assets/images/screenshots/flutter_02.png" width="45%"> |
+
+| <img src="https://raw.githubusercontent.com/Ruchan10/ShoeStore/main/assets/images/screenshots/flutter_03.png" width="45%"> | <img src="https://raw.githubusercontent.com/Ruchan10/ShoeStore/main/assets/images/screenshots/flutter_04.png" width="45%"> |
+
+| <img src="https://raw.githubusercontent.com/Ruchan10/ShoeStore/main/assets/images/screenshots/flutter_05.png" width="45%"> | <img src="https://raw.githubusercontent.com/Ruchan10/ShoeStore/main/assets/images/screenshots/flutter_06.png" width="45%"> |
 
 ## Project Setup Instructions
 
