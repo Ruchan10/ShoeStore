@@ -239,7 +239,7 @@ class _ProductDetailViewState extends ConsumerState<ProductDetailView> {
                     child: const Button(
                         label: "SEE ALL REVIEW",
                         textColor: Colors.black,
-                        width: double.infinity),
+                        width: double.infinity,),
                   ),
                 ),
                 const SizedBox(height: 16),

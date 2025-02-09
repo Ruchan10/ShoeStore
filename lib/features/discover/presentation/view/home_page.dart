@@ -104,8 +104,6 @@ class _HomePageViewState extends ConsumerState<HomePageView> {
                         itemCount: filteredShoes.length,
                         itemBuilder: (context, index) {
                           final shoe = filteredShoes[index];
-                          print("_-------------------");
-                          print(shoe.shoeImage);
                           return Card(
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8.0),
