@@ -1,11 +1,14 @@
-Sure! Here's a README template for your GitHub repository that covers project setup, assumptions, challenges, and additional features. You can modify the details according to your project's specifics.
-
-```markdown
 # Shoe Store App
 
 ## Overview
 
 The Shoe Store App is a Flutter application that allows users to browse and manage their cart of shoe products. The app integrates with a backend service to fetch cart details, manage cart items, and perform checkout operations.
+
+### Try the app
+1. Navigate to the [Releases](https://github.com/Ruchan10/ShoeStore/releases) section of this repository.  
+2. Download the latest APK.  
+3. Install the APK on your Android device to explore the app.
+
 
 ## Project Setup Instructions
 
@@ -14,13 +17,13 @@ To set up and run this project on your local machine, follow these instructions:
 1. **Clone the Repository**
 
    ```bash
-   git clone https://github.com/yourusername/shoe_store_app.git
+   git clone https://github.com/Ruchan10/ShoeStore.git
    ```
 
 2. **Navigate to the Project Directory**
 
    ```bash
-   cd shoe_store_app
+   cd ShoeStore
    ```
 
 3. **Install Dependencies**
@@ -84,6 +87,3 @@ During development, the following assumptions were made:
 - **Backend Integration**: Proper integration with backend services for fetching and managing cart data.
 - **Bonus Features**: Added improvements such as responsive UI and enhanced error handling.
 
-## Contributing
-
-Feel free to submit issues or pull requests if you have suggestions or improvements. Please follow the code of conduct and ensure that your contributions adhere to the project's coding standards.
